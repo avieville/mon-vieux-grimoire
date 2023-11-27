@@ -83,3 +83,47 @@ exports.deleteBook = (req, res, next) => {
       res.status(500).json({ error });
     });
 };
+
+exports.getTheThreeBestBooksByRating = (req, res, next) => {
+  Book.find()
+    .sort({ averageRating: "desc" })
+    .limit(3)
+    .then((books) => {
+      res.status(200).json(books);
+    })
+    .catch((error) => res.status(500).json({ error }));
+};
+
+exports.sendRating = (req, res, next) => {
+  if (req.body.rating < 0 || req.body.rating > 5) {
+    res.status(400).json({ message: "the score must be between 0 and 5" });
+  }
+
+  Book.findOne({ _id: req.params.id }).then((book) => {
+    if (book.ratings.some((rating) => rating.userId === req.auth.userId)) {
+      res.status(401).json({ message: "You have already rated this book" });
+    } else {
+      const ratingObject = {
+        userId: req.auth.userId,
+        grade: req.body.rating,
+      };
+
+      book.ratings.push(ratingObject);
+
+      const SumOflRating = book.ratings.reduce(
+        (acc, rating) => acc + rating.grade,
+        0
+      );
+      book.averageRating = SumOflRating / book.ratings.length;
+
+      book
+        .save()
+        .then(() => {
+          res.status(200).json(book);
+        })
+        .catch((error) => {
+          res.status(500).json({ error });
+        });
+    }
+  });
+};
