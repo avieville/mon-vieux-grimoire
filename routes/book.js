@@ -6,8 +6,10 @@ const multer = require("../middleware/multer-config");
 
 const bookCtrl = require("../controllers/book");
 
-router.post("/", auth, multer, bookCtrl.createBook);
-router.put("/:id", auth, multer, bookCtrl.modifyBook);
+const imageProcessing = require("../middleware/imageProcessing");
+
+router.post("/", auth, multer, imageProcessing, bookCtrl.createBook);
+router.put("/:id", auth, multer, imageProcessing, bookCtrl.modifyBook);
 router.get("/bestrating", bookCtrl.getTheThreeBestBooksByRating);
 router.get("/:id", bookCtrl.getOneBook);
 router.get("/", bookCtrl.getAllBook);

@@ -9,7 +9,7 @@ exports.createBook = (req, res, next) => {
     ...bookObject,
     userId: req.auth.userId,
     imageUrl: `${req.protocol}://${req.get("host")}/images/${
-      req.file.filename
+      req.file.modifiedName
     }`,
   });
 
@@ -40,7 +40,7 @@ exports.modifyBook = (req, res, next) => {
     ? {
         ...JSON.parse(req.body.book),
         imageUrl: `${req.protocol}://${req.get("host")}/images/${
-          req.file.filename
+          req.file.modifiedName
         }`,
       }
     : { ...req.body };
